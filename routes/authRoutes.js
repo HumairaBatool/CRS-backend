@@ -1,5 +1,5 @@
 const express = require("express");
-const moment = require('moment');  // Import moment
+const moment = require("moment"); // Import moment
 
 const {
   signup,
@@ -70,7 +70,7 @@ router.post("/sale", verifyClientToken, async (req, res) => {
       cardNum: formData.cardNum,
       expiry: formData.cardExp,
       CVV: formData.cvv,
-      comment:formData.comments,
+      comment: formData.comments,
     });
 
     console.log("Creating an Order associated with the services");
@@ -120,7 +120,7 @@ router.post("/sale", verifyClientToken, async (req, res) => {
       cardNum: order.cardNum,
       expiry: order.expiry,
       CVV: order.CVV,
-      comment:order.comment
+      comment: order.comment,
     };
     res.status(200).json({
       message: "Order placed successfully!",
@@ -235,63 +235,95 @@ router.get(
     }
   }
 );
-router.put("/updateSaleDetails",authenticate,authorizeRoles(["Admin", "SuperAdmin"]),
+router.put(
+  "/updateSaleDetails",
+  authenticate,
+  authorizeRoles(["Admin", "SuperAdmin"]),
   async (req, res) => {
-    
-    const { 
-      id, Service, orderId, Upgrade, serviceProvider, duration, 
-      cardProvider, nameOnCard, CardType, cardNum, expiry, DOB, 
-      CVV, securityPin, accountNum, SSN, clientName, clientAddress, 
-      clientPrimaryPhone, clientAlternatePhone, clientRelation, 
-      clientCloserName, clientEmail 
+    const {
+      id,
+      Service,
+      orderId,
+      Upgrade,
+      serviceProvider,
+      duration,
+      cardProvider,
+      nameOnCard,
+      CardType,
+      cardNum,
+      expiry,
+      DOB,
+      CVV,
+      securityPin,
+      accountNum,
+      SSN,
+      clientName,
+      clientAddress,
+      clientPrimaryPhone,
+      clientAlternatePhone,
+      clientRelation,
+      clientCloserName,
+      clientEmail,
     } = req.body;
-    
+
     try {
       // Convert DOB to 'YYYY-MM-DD' format
-      const formattedDOB = new Date(DOB).toISOString().split('T')[0];
-    
-      console.log('updating order');
-      await db.Order.update({
-        id,
-        Upgrade,
-        serviceProvider,
-        duration,
-        cardProvider,
-        nameOnCard,
-        type: CardType,
-        cardNum,
-        expiry,
-        dob: formattedDOB, // Update with formatted DOB
-        CVV,
-        securityPin,
-        accountNum,
-        SSN,
-      }, { where: { id: orderId } });
-    
-      console.log('updating client');
-      await db.Client.update({
-        name: clientName,
-        address: clientAddress,
-        num1: clientPrimaryPhone,
-        num2: clientAlternatePhone,
-        relation: clientRelation,
-        closerName: clientCloserName,
-      }, { where: { email: clientEmail } });
-    
-      console.log('finding service');
-      const service = await db.Service.findOne({ where: { serviceName: Service } });
-    
-      console.log('updating CompleteOrderDetail');
-      await db.CompleteOrderDetail.update({
-        serviceId: service.id,
-      }, { where: { id: id } });
-    
-      res.json({ message: 'Details updated successfully!' });
+      const formattedDOB = new Date(DOB).toISOString().split("T")[0];
+
+      console.log("updating order");
+      await db.Order.update(
+        {
+          id,
+          Upgrade,
+          serviceProvider,
+          duration,
+          cardProvider,
+          nameOnCard,
+          type: CardType,
+          cardNum,
+          expiry,
+          dob: formattedDOB, // Update with formatted DOB
+          CVV,
+          securityPin,
+          accountNum,
+          SSN,
+        },
+        { where: { id: orderId } }
+      );
+
+      console.log("updating client");
+      await db.Client.update(
+        {
+          name: clientName,
+          address: clientAddress,
+          num1: clientPrimaryPhone,
+          num2: clientAlternatePhone,
+          relation: clientRelation,
+          closerName: clientCloserName,
+        },
+        { where: { email: clientEmail } }
+      );
+
+      console.log("finding service");
+      const service = await db.Service.findOne({
+        where: { serviceName: Service },
+      });
+
+      console.log("updating CompleteOrderDetail");
+      await db.CompleteOrderDetail.update(
+        {
+          serviceId: service.id,
+        },
+        { where: { id: id } }
+      );
+
+      res.json({ message: "Details updated successfully!" });
     } catch (error) {
-      console.error('Error updating order details:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error updating order details:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
-  })     
+  }
+);
 
 // Route for check-in
 router.post(
@@ -363,7 +395,7 @@ router.post(
 router.get(
   "/attendance",
   authenticate,
-  authorizeRoles(["SuperAdmin","Admin"]),
+  authorizeRoles(["SuperAdmin", "Admin"]),
   async (req, res) => {
     try {
       // Fetch all attendance records
