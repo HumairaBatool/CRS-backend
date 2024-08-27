@@ -1,0 +1,1835 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "CRM API-DOCUMENTATION",
+    "version": "1.0.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT authorization using the Bearer scheme. Example: 'Authorization: Bearer ${token}'"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "summary": "User login",
+        "tags": ["Users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "admin1@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "123"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Logged-in successfully"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer", "example": 1 },
+                        "username": { "type": "string", "example": "JohnDoe" },
+                        "email": {
+                          "type": "string",
+                          "example": "user@example.com"
+                        },
+                        "roleId": { "type": "integer", "example": 2 },
+                        "roleName": { "type": "string", "example": "Admin" },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "example": "read:reports"
+                          }
+                        }
+                      }
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Invalid Credentials"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/signup": {
+      "post": {
+        "summary": "User Signup",
+        "tags": ["Users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "JohnDoe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password123"
+                  },
+                  "roleName": {
+                    "type": "string",
+                    "example": "Admin"
+                  }
+                },
+                "required": ["username", "email", "password", "roleName"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Signup",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Signed Up successfully"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer", "example": 1 },
+                        "username": { "type": "string", "example": "JohnDoe" },
+                        "email": {
+                          "type": "string",
+                          "example": "john@example.com"
+                        },
+                        "roleId": { "type": "integer", "example": 2 },
+                        "roleName": { "type": "string", "example": "Admin" },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "example": "read:reports"
+                          }
+                        }
+                      }
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "All fields are required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "All fields are required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Email already registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email already registered"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/getAllUsers": {
+      "get": {
+        "summary": "Retrieve all users",
+        "description": "Fetch a list of all users including their roles. Restricted to Admins and Super Admins.",
+        "tags": ["Users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of all users with their role information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer", "example": 1 },
+                      "username": { "type": "string", "example": "JohnDoe" },
+                      "email": {
+                        "type": "string",
+                        "example": "john@example.com"
+                      },
+                      "roleName": { "type": "string", "example": "Admin" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Unauthorized" }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have permission to access this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Forbidden" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/updateUserRole": {
+      "put": {
+        "summary": "Update User Role",
+        "tags": ["Users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "newRoleName": {
+                    "type": "string",
+                    "example": "Manager"
+                  }
+                },
+                "required": ["userId", "newRoleName"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User role updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User role updated successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request, e.g., trying to update your own role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Cannot change your own role"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden, e.g., Admin trying to update other Admin's role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Admins cannot change roles of other Admins or Super Admins"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid role"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Error in updating user role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error in updating user role"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sale": {
+      "post": {
+        "summary": "Create a new sale order",
+        "tags": ["Sales"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wantToUpgradeBoxes": {
+                    "type": "string",
+                    "example": "Yes"
+                  },
+                  "serviceProvider": {
+                    "type": "string",
+                    "example": "Spectrum"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "example": "1-3 Years"
+                  },
+                  "securityPin": {
+                    "type": "string",
+                    "example": "1234"
+                  },
+                  "accNum": {
+                    "type": "string",
+                    "example": "123456789"
+                  },
+                  "ssn": {
+                    "type": "string",
+                    "example": "123-45-6789"
+                  },
+                  "dateOfBirth": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "1990-01-01"
+                  },
+                  "cardProvider": {
+                    "type": "string",
+                    "example": "Visa"
+                  },
+                  "nameOnCard": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "cardType": {
+                    "type": "string",
+                    "example": "Credit"
+                  },
+                  "cardNum": {
+                    "type": "string",
+                    "example": "4111111111111111"
+                  },
+                  "cardExp": {
+                    "type": "string",
+                    "example": "12/24"
+                  },
+                  "cvv": {
+                    "type": "string",
+                    "example": "123"
+                  },
+                  "comments": {
+                    "type": "string",
+                    "example": "Please handle with care"
+                  },
+                  "activeServices": {
+                    "type": "array",
+                    "items": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "required": [
+                  "wantToUpgradeBoxes",
+                  "serviceProvider",
+                  "duration",
+                  "securityPin",
+                  "accNum",
+                  "ssn",
+                  "dateOfBirth",
+                  "cardProvider",
+                  "nameOnCard",
+                  "cardType",
+                  "cardNum",
+                  "cardExp",
+                  "cvv",
+                  "comments",
+                  "activeServices"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order placed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Order placed successfully!"
+                    },
+                    "order": {
+                      "type": "object",
+                      "properties": {
+                        "clientId": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "id": {
+                          "type": "integer",
+                          "example": 123
+                        },
+                        "Upgrade": {
+                          "type": "string",
+                          "example": "Yes"
+                        },
+                        "serviceProvider": {
+                          "type": "string",
+                          "example": "Spectrum"
+                        },
+                        "duration": {
+                          "type": "string",
+                          "example": "1-3 Years"
+                        },
+                        "services": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "securityPin": {
+                          "type": "string",
+                          "example": "1234"
+                        },
+                        "accountNum": {
+                          "type": "string",
+                          "example": "123456789"
+                        },
+                        "SSN": {
+                          "type": "string",
+                          "example": "123-45-6789"
+                        },
+                        "dob": {
+                          "type": "string",
+                          "format": "date",
+                          "example": "1990-01-01"
+                        },
+                        "cardProvider": {
+                          "type": "string",
+                          "example": "Visa"
+                        },
+                        "nameOnCard": {
+                          "type": "string",
+                          "example": "John Doe"
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "Credit"
+                        },
+                        "cardNum": {
+                          "type": "string",
+                          "example": "4111111111111111"
+                        },
+                        "expiry": {
+                          "type": "string",
+                          "example": "12/24"
+                        },
+                        "CVV": {
+                          "type": "string",
+                          "example": "123"
+                        },
+                        "comment": {
+                          "type": "string",
+                          "example": "Please handle with care"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid service: Cable"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while placing the order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An error occurred while placing order"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clientLogin": {
+      "post": {
+        "summary": "Client login",
+        "tags": ["Client"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "client@example.com"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login with token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjg4NzI2NTU4LCJleHBpIjoxNjg4NzMwMTU4fQ.5T4Jf1lGvh8ZZk05HsbFVZ1RrkJHMI_QlA0pLUNbAPs"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email not registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email not registered"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clientSignup": {
+      "post": {
+        "summary": "Client Signup",
+        "description": "Registers a new client and returns a token upon successful signup.",
+        "tags": ["Client"],
+        "requestBody": {
+          "description": "Data required to sign up a new client",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe",
+                    "description": "Client's full name"
+                  },
+                  "accEmailAdd": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com",
+                    "description": "Client's email address"
+                  },
+                  "accAddress": {
+                    "type": "string",
+                    "example": "123 Main St",
+                    "description": "Client's address"
+                  },
+                  "accPhoneNum": {
+                    "type": "string",
+                    "example": "1234567890",
+                    "description": "Client's primary phone number"
+                  },
+                  "altPhoneNum": {
+                    "type": "string",
+                    "example": "0987654321",
+                    "description": "Client's alternate phone number"
+                  },
+                  "onCallPerson": {
+                    "type": "string",
+                    "example": "Jane Doe",
+                    "description": "On call person / relation"
+                  },
+                  "nameOfCloser": {
+                    "type": "string",
+                    "example": "Jake Smith",
+                    "description": "Name of the closer"
+                  }
+                },
+                "required": [
+                  "accEmailAdd",
+                  "name",
+                  "accAddress",
+                  "accPhoneNum",
+                  "onCallPerson",
+                  "nameOfCloser"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signup successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Signed Up successfully"
+                    },
+                    "client": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1,
+                          "description": "Client ID"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "John Doe",
+                          "description": "Client's full name"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "example": "john.doe@example.com",
+                          "description": "Client's email address"
+                        },
+                        "address": {
+                          "type": "string",
+                          "example": "123 Main St",
+                          "description": "Client's address"
+                        },
+                        "dob": {
+                          "type": "string",
+                          "format": "date",
+                          "example": "1990-01-01",
+                          "description": "Client's date of birth"
+                        },
+                        "num1": {
+                          "type": "string",
+                          "example": "1234567890",
+                          "description": "Client's primary phone number"
+                        },
+                        "num2": {
+                          "type": "string",
+                          "example": "0987654321",
+                          "description": "Client's alternate phone number"
+                        },
+                        "relation": {
+                          "type": "string",
+                          "example": "Jane Doe",
+                          "description": "Relation of the on-call person"
+                        },
+                        "closerName": {
+                          "type": "string",
+                          "example": "Jake Smith",
+                          "description": "Name of the closer"
+                        }
+                      }
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                      "description": "JWT token for the client"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email already registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email already registered"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Error in registering Client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error in registering Client"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/getClientDetail": {
+        "get": {
+          "summary": "Get Client Details",
+          "description": "Fetches details of the authenticated client using the JWT token.",
+          "tags": ["Client"],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Client details retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "client": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1,
+                            "description": "Client ID"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "John Doe",
+                            "description": "Client's full name"
+                          },
+                          "email": {
+                            "type": "string",
+                            "format": "email",
+                            "example": "john.doe@example.com",
+                            "description": "Client's email address"
+                          },
+                          "address": {
+                            "type": "string",
+                            "example": "123 Main St",
+                            "description": "Client's address"
+                          },
+                          "dob": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "1990-01-01",
+                            "description": "Client's date of birth"
+                          },
+                          "num1": {
+                            "type": "string",
+                            "example": "1234567890",
+                            "description": "Client's primary phone number"
+                          },
+                          "num2": {
+                            "type": "string",
+                            "example": "0987654321",
+                            "description": "Client's alternate phone number"
+                          },
+                          "relation": {
+                            "type": "string",
+                            "example": "Jane Doe",
+                            "description": "Relation of the on-call person"
+                          },
+                          "closerName": {
+                            "type": "string",
+                            "example": "Jake Smith",
+                            "description": "Name of the closer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client not found or bad request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Client not found"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "No token provided or invalid token",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Failed to authenticate token"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Error fetching client details"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+    "/api/sales-details": {
+      "get": {
+        "summary": "Retrieve sales details",
+        "tags": ["Sales"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of sales details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "orderId": {
+                        "type": "integer",
+                        "example": 123
+                      },
+                      "clientName": {
+                        "type": "string",
+                        "example": "John Doe"
+                      },
+                      "agentName": {
+                        "type": "string",
+                        "example": "Jane Smith"
+                      },
+                      "Service": {
+                        "type": "string",
+                        "example": "Internet"
+                      },
+                      "serviceProvider": {
+                        "type": "string",
+                        "example": "Spectrum"
+                      },
+                      "duration": {
+                        "type": "string",
+                        "example": "1-3 Years"
+                      },
+                      "Upgradation": {
+                        "type": "string",
+                        "example": "Yes"
+                      },
+                      "securityPin": {
+                        "type": "string",
+                        "example": "1234"
+                      },
+                      "accountNum": {
+                        "type": "string",
+                        "example": "9876543210"
+                      },
+                      "SSN": {
+                        "type": "string",
+                        "example": "123-45-6789"
+                      },
+                      "cardProvider": {
+                        "type": "string",
+                        "example": "Visa"
+                      },
+                      "nameOnCard": {
+                        "type": "string",
+                        "example": "John Doe"
+                      },
+                      "CardType": {
+                        "type": "string",
+                        "example": "Credit"
+                      },
+                      "cardNum": {
+                        "type": "string",
+                        "example": "4111111111111111"
+                      },
+                      "DOB": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1980-01-01"
+                      },
+                      "expiry": {
+                        "type": "string",
+                        "example": "12/24"
+                      },
+                      "CVV": {
+                        "type": "string",
+                        "example": "123"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated or not permitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales-details/{saleID}": {
+        "get": {
+          "summary": "Fetch details of a specific sales order",
+          "tags": ["Sales"],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "saleID",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the sales order to fetch details for"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved sales order details",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "ID of the order"
+                        },
+                        "orderId": {
+                          "type": "integer",
+                          "description": "Order ID"
+                        },
+                        "clientName": {
+                          "type": "string",
+                          "description": "Name of the client"
+                        },
+                        "clientEmail": {
+                          "type": "string",
+                          "description": "Email of the client"
+                        },
+                        "clientAddress": {
+                          "type": "string",
+                          "description": "Address of the client"
+                        },
+                        "clientPrimaryPhone": {
+                          "type": "string",
+                          "description": "Primary phone number of the client"
+                        },
+                        "clientAlternatePhone": {
+                          "type": "string",
+                          "description": "Alternate phone number of the client"
+                        },
+                        "clientRelation": {
+                          "type": "string",
+                          "description": "Relation of the client"
+                        },
+                        "clientCloserName": {
+                          "type": "string",
+                          "description": "Name of the closer"
+                        },
+                        "agentName": {
+                          "type": "string",
+                          "description": "Name of the agent"
+                        },
+                        "Service": {
+                          "type": "string",
+                          "description": "Name of the service"
+                        },
+                        "Upgrade": {
+                          "type": "string",
+                          "description": "Upgrade information"
+                        },
+                        "serviceProvider": {
+                          "type": "string",
+                          "description": "Service provider"
+                        },
+                        "duration": {
+                          "type": "string",
+                          "description": "Duration of the service"
+                        },
+                        "comment": {
+                          "type": "string",
+                          "description": "Additional comments"
+                        },
+                        "securityPin": {
+                          "type": "string",
+                          "description": "Security pin"
+                        },
+                        "accountNum": {
+                          "type": "string",
+                          "description": "Account number"
+                        },
+                        "SSN": {
+                          "type": "string",
+                          "description": "Social Security Number"
+                        },
+                        "cardProvider": {
+                          "type": "string",
+                          "description": "Card provider"
+                        },
+                        "nameOnCard": {
+                          "type": "string",
+                          "description": "Name on the card"
+                        },
+                        "CardType": {
+                          "type": "string",
+                          "description": "Type of card"
+                        },
+                        "cardNum": {
+                          "type": "string",
+                          "description": "Card number"
+                        },
+                        "DOB": {
+                          "type": "string",
+                          "format": "date",
+                          "description": "Date of Birth"
+                        },
+                        "expiry": {
+                          "type": "string",
+                          "format": "date",
+                          "description": "Expiry date of the card"
+                        },
+                        "CVV": {
+                          "type": "string",
+                          "description": "Card Verification Value"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request, invalid or missing parameters"
+            },
+            "401": {
+              "description": "Unauthorized, invalid or missing token"
+            },
+            "403": {
+              "description": "Forbidden, insufficient permissions"
+            },
+            "500": {
+              "description": "Internal server error"
+            },
+            "501":{
+                "description":"Invalid Order ID"
+            }
+          }
+        }
+      },
+    "/api/updateSaleDetails": {
+      "put": {
+        "summary": "Update sale details",
+        "tags": ["Sales"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "Service": {
+                    "type": "string",
+                    "example": "Internet"
+                  },
+                  "orderId": {
+                    "type": "integer",
+                    "example": 123
+                  },
+                  "Upgrade": {
+                    "type": "string",
+                    "example": "Yes"
+                  },
+                  "serviceProvider": {
+                    "type": "string",
+                    "example": "Spectrum"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "example": "1-3 Years"
+                  },
+                  "cardProvider": {
+                    "type": "string",
+                    "example": "Visa"
+                  },
+                  "nameOnCard": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "CardType": {
+                    "type": "string",
+                    "example": "Credit"
+                  },
+                  "cardNum": {
+                    "type": "string",
+                    "example": "4111111111111111"
+                  },
+                  "expiry": {
+                    "type": "string",
+                    "example": "12/24"
+                  },
+                  "DOB": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "1980-01-01"
+                  },
+                  "CVV": {
+                    "type": "string",
+                    "example": "123"
+                  },
+                  "securityPin": {
+                    "type": "string",
+                    "example": "1234"
+                  },
+                  "accountNum": {
+                    "type": "string",
+                    "example": "9876543210"
+                  },
+                  "SSN": {
+                    "type": "string",
+                    "example": "123-45-6789"
+                  },
+                  "clientName": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "clientAddress": {
+                    "type": "string",
+                    "example": "123 Elm Street"
+                  },
+                  "clientPrimaryPhone": {
+                    "type": "string",
+                    "example": "555-1234"
+                  },
+                  "clientAlternatePhone": {
+                    "type": "string",
+                    "example": "555-5678"
+                  },
+                  "clientRelation": {
+                    "type": "string",
+                    "example": "Brother"
+                  },
+                  "clientCloserName": {
+                    "type": "string",
+                    "example": "Jane Smith"
+                  },
+                  "clientEmail": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  }
+                },
+                "required": [
+                  "id",
+                  "Service",
+                  "orderId",
+                  "Upgrade",
+                  "serviceProvider",
+                  "duration",
+                  "cardProvider",
+                  "nameOnCard",
+                  "CardType",
+                  "cardNum",
+                  "expiry",
+                  "DOB",
+                  "CVV",
+                  "securityPin",
+                  "accountNum",
+                  "SSN",
+                  "clientName",
+                  "clientAddress",
+                  "clientPrimaryPhone",
+                  "clientAlternatePhone",
+                  "clientRelation",
+                  "clientCloserName",
+                  "clientEmail"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful update of sale details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Details updated successfully!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid input data"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have the required role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attendance/check-in": {
+      "post": {
+        "summary": "Check-in for Sales Agent",
+        "description": "Allows Sales Agents to check in. Requires authentication and the SalesAgent role.",
+        "tags": ["Attendance"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Information required to check in",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "agentId": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the agent checking in"
+                  }
+                },
+                "required": ["agentId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Check-in successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Attendance record ID"
+                    },
+                    "agentId": {
+                      "type": "integer",
+                      "description": "ID of the agent"
+                    },
+                    "checkInTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Time of check-in"
+                    }
+                  },
+                  "required": ["id", "agentId", "checkInTime"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, invalid or missing token"
+          },
+          "404": {
+            "description": "User not found or not an agent"
+          },
+          "500": {
+            "description": "Server error, failed to check in"
+          }
+        }
+      }
+    },
+
+    "/api/attendance/check-out": {
+      "post": {
+        "summary": "Check out an agent. accessed by Agent only",
+        "tags": ["Attendance"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "agentId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                },
+                "required": ["agentId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent checked out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "agentId": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "checkInTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-08-23T08:00:00Z"
+                    },
+                    "checkOutTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-08-23T17:00:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid agentId"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have the required role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - No check-in record found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "No check-in record found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Failed to check out"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attendance": {
+      "get": {
+        "summary": "Get all attendance records. accessed by super-admin only",
+        "tags": ["Attendance"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attendance records retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "agentId": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "checkInTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-23T08:00:00Z"
+                      },
+                      "checkOutTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-23T17:00:00Z"
+                      },
+                      "User": {
+                        "type": "object",
+                        "properties": {
+                          "username": {
+                            "type": "string",
+                            "example": "john_doe"
+                          },
+                          "email": {
+                            "type": "string",
+                            "example": "john.doe@example.com"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have the required role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Failed to retrieve attendance records"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+  }
+}

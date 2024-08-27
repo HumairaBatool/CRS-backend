@@ -81,9 +81,18 @@ const getClientDetail = async (req, res) => {
     res.status(402).json({ message: 'Error fetching client details' });
   }
 };
-
+const getClientCount=async(req,res)=>{
+try{  const clientsCount=await db.Client.count()
+  res.json(clientsCount)
+ } 
+ catch{
+  console.log('Error in fetching clinet count')
+  res.status(500).json({message:'error in fetching client count'})
+ }
+}
 module.exports = {
   clientSignup,
   clientLogin,
   getClientDetail,
+  getClientCount,
 };

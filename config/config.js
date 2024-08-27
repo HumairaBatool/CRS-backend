@@ -13,15 +13,15 @@ module.exports = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,  // This should be provided
+    dialect: process.env.DB_DIALECT, 
   },
   production: {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,  // This should be provided
+    dialect: process.env.DB_DIALECT,  
   },
-  secretKey:Math.floor(100000000 + Math.random() * 900000000).toString(),
+  secretKey:process.env.SECRET_KEY,
   port: process.env.PORT,
 };

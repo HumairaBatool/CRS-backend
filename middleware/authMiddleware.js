@@ -4,10 +4,14 @@ const { secretKey } = require("../config/config");
 // Middleware Functions
 const authenticate = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
-  if (!token) return res.status(401).send("Access Denied");
+  if (!token) { 
+    console.log('No token provided');
+    return res.status(401).send("Access Denied");
+  }
 
   jwt.verify(token, secretKey, (err, decoded) => {
     if (err) {
+      console.log('Token error:', err);
       if (err.name === "TokenExpiredError") {
         return res.status(401).send("Token expired");
       }
@@ -17,6 +21,7 @@ const authenticate = (req, res, next) => {
     next();
   });
 };
+
 // Middleware to verify JWT token
 const verifyClientToken = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];

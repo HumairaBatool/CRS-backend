@@ -53,12 +53,14 @@ const signup = async (req, res) => {
   }
 };
 
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await db.User.findOne({ where: { email }, include: [db.Role] });
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res.status(400).json("Invalid Credentials");
   }
+ 
   const token = await generateToken(user);
   res.json({
     message: "Logged-in successfully",
