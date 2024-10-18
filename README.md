@@ -5,5 +5,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 ## Development server
 
 1. Run `npm install`
-2. Run `node server.js` for a dev server. 
+2. Run `npm install cors` 
+2. Run `npx sequelize-cli db:migrate` 
+3. Run `npx sequelize-cli db:seed:all`
+4. Run `node server.js` 
 
